@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-func main() {
-	buf, err := os.ReadFile("../_resources/A and A7 arpeggio forms.xml")
+func main2() {
+	buf, err := os.ReadFile("/Users/richardjonas/projects/music/_resources/A and A7 arpeggio forms.xml")
 	if err != nil {
 		panic(err)
 	}
@@ -18,5 +18,51 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%+v\n", score)
+	part := score.Part[0]
+	measure := part.Measure[0]
+
+	for _, note := range measure.Note {
+		fmt.Printf("%s%d\n", note.Pitch.Step, note.Pitch.Octave)
+
+		for _, notation := range note.Notations.Items {
+			fmt.Printf("notation: %T\n", notation)
+			switch n := notation.(type) {
+			case gomusicxml.Technical:
+				fmt.Printf("technical: fret=%d string=%d\n", *n.Fret, *n.String)
+				if n.Extra != "" {
+					fmt.Printf("guitar pro data: %s\n", n.Extra)
+				}
+			default:
+				fmt.Printf("unknown notation: %T\n", notation)
+			}
+		}
+	}
+}
+
+func main() {
+	var note gomusicxml.Note
+	note.Pitch.Step = "A"
+	note.Pitch.Octave = 4
+	note.Duration = 1
+	note.Type = "quarter"
+	note.Notations = gomusicxml.Notations{
+		Items: []gomusicxml.Notation{
+			gomusicxml.Technical{
+				Fret:   new(5),
+				String: new(4),
+				HammerOn: &gomusicxml.HammerOn{
+					Number: 1,
+					Text:   "H",
+					Type:   "start",
+				},
+				Extra: `<?GP <root><string>6</string><fret>12</fret></root> ?>`,
+			},
+		},
+	}
+
+	buf, err := xml.MarshalIndent(note, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(buf))
 }
