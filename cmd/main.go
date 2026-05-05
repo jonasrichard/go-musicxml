@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	gomusicxml "go-musicxml"
 	"os"
+
+	musicxml "github.com/jonasrichard/go-musicxml"
 )
 
 func main2() {
@@ -13,7 +14,7 @@ func main2() {
 		panic(err)
 	}
 
-	var score gomusicxml.ScorePartwise
+	var score musicxml.ScorePartwise
 	if err := xml.Unmarshal(buf, &score); err != nil {
 		panic(err)
 	}
@@ -27,7 +28,7 @@ func main2() {
 		for _, notation := range note.Notations.Items {
 			fmt.Printf("notation: %T\n", notation)
 			switch n := notation.(type) {
-			case gomusicxml.Technical:
+			case musicxml.Technical:
 				fmt.Printf("technical: fret=%d string=%d\n", *n.Fret, *n.String)
 				if n.Extra != "" {
 					fmt.Printf("guitar pro data: %s\n", n.Extra)
@@ -40,17 +41,17 @@ func main2() {
 }
 
 func main() {
-	var note gomusicxml.Note
+	var note musicxml.Note
 	note.Pitch.Step = "A"
 	note.Pitch.Octave = 4
 	note.Duration = 1
 	note.Type = "quarter"
-	note.Notations = gomusicxml.Notations{
-		Items: []gomusicxml.Notation{
-			gomusicxml.Technical{
+	note.Notations = musicxml.Notations{
+		Items: []musicxml.Notation{
+			musicxml.Technical{
 				Fret:   new(5),
 				String: new(4),
-				HammerOn: &gomusicxml.HammerOn{
+				HammerOn: &musicxml.HammerOn{
 					Number: 1,
 					Text:   "H",
 					Type:   "start",
