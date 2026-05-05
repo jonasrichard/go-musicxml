@@ -6,18 +6,35 @@ import (
 )
 
 type Note struct {
-	XMLName  xml.Name `xml:"note"`
-	Pitch    Pitch    `xml:"pitch"`
-	Duration int      `xml:"duration"`
-	Type     string   `xml:"type"`
-	// TODO model it correctly
-	Rest      *struct{} `xml:"rest,omitempty"`
-	Notations Notations `xml:"notations"`
+	XMLName          xml.Name          `xml:"note"`
+	Pitch            Pitch             `xml:"pitch"`
+	Duration         int               `xml:"duration"`
+	Type             string            `xml:"type"`
+	TimeModification *TimeModification `xml:"time-modification,omitempty"`
+	Dot              *struct{}         `xml:"dot,omitempty"`
+	Stem             *string           `xml:"stem,omitempty"`
+	Notehead         *string           `xml:"notehead,omitempty"`
+	Staff            *int              `xml:"staff,omitempty"`
+	Beam             []Beam            `xml:"beam,omitempty"`
+	Rest             *struct{}         `xml:"rest,omitempty"`
+	Notations        Notations         `xml:"notations"`
 }
 
 type Pitch struct {
 	Step   string `xml:"step"`
+	Alter  *int   `xml:"alter,omitempty"`
 	Octave int    `xml:"octave"`
+}
+
+type Beam struct {
+	Number int `xml:"number,attr"`
+	// Type can be "begin", "continue", "end", or "forward hook" or "backward hook"
+	Type string `xml:",chardata"`
+}
+
+type TimeModification struct {
+	ActualNotes int `xml:"actual-notes"`
+	NormalNotes int `xml:"normal-notes"`
 }
 
 type Notations struct {

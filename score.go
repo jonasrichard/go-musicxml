@@ -10,10 +10,12 @@ type ScorePartwise struct {
 }
 
 type PartList struct {
-	ScorePart []struct {
-		ID   string `xml:"id,attr"`
-		Name string `xml:"part-name"`
-	} `xml:"score-part"`
+	ScorePart []ScorePart `xml:"score-part"`
+}
+
+type ScorePart struct {
+	ID   string `xml:"id,attr"`
+	Name string `xml:"part-name"`
 }
 
 type Part struct {
@@ -21,23 +23,24 @@ type Part struct {
 	Measure []Measure `xml:"measure"`
 }
 
-type Measure struct {
-	Number     string     `xml:"number,attr"`
-	Attributes Attributes `xml:"attributes"`
-	Note       []Note     `xml:"note"`
+// NewScorePartwise creates a new ScorePartwise with default values.
+func NewScorePartwise() ScorePartwise {
+	return ScorePartwise{
+		Version: "4.0",
+	}
 }
 
-type Attributes struct {
-	Divisions int `xml:"divisions"`
-	Key       struct {
-		Fifths int `xml:"fifths"`
-	} `xml:"key"`
-	Time struct {
-		Beats    int `xml:"beats"`
-		BeatType int `xml:"beat-type"`
-	} `xml:"time"`
-	Clef []struct {
-		Sign string `xml:"sign"`
-		Line int    `xml:"line"`
-	} `xml:"clef"`
+// AddPart adds a new part to the score with the given ID and name.
+func (s *ScorePartwise) AddPart(id, name string) *Part {
+	s.PartList.ScorePart = append(s.PartList.ScorePart, ScorePart{
+		ID:   id,
+		Name: name,
+	})
+	s.Part = append(s.Part, Part{ID: id})
+
+	return &s.Part[len(s.Part)-1]
+}
+
+func (p *Part) AddMeasure(measure *Measure) {
+	p.Measure = append(p.Measure, *measure)
 }
